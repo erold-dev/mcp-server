@@ -26,6 +26,8 @@ const KnowledgeCategorySchema = z.enum([
   'other',
 ]);
 
+const KnowledgeScopeSchema = z.enum(['all', 'global', 'project', 'combined']);
+
 // =============================================================================
 // Tool Registration
 // =============================================================================
@@ -88,6 +90,8 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
           category: article.category,
           content: article.content,
           tags: article.tags || [],
+          projectId: article.projectId || null,
+          scope: article.projectId ? 'project' : 'global',
           createdAt: article.createdAt,
           updatedAt: article.updatedAt,
         }, null, 2);
@@ -102,11 +106,19 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
   // ---------------------------------------------------------------------------
   mcp.addTool({
     name: 'list_knowledge',
-    description: 'List knowledge articles, optionally filtered by category.',
+    description:
+      'List knowledge articles, optionally filtered by category and/or project. ' +
+      'Use scope to control visibility: "all" (default), "global" (only global), ' +
+      '"project" (only project-specific), "combined" (global + specific project).',
     parameters: z.object({
       category: KnowledgeCategorySchema.optional().describe(
         'Filter by category: architecture, api, deployment, testing, security, ' +
         'performance, workflow, conventions, troubleshooting, other'
+      ),
+      projectId: z.string().optional().describe('Filter by project ID'),
+      scope: KnowledgeScopeSchema.optional().describe(
+        'Scope: "all" (everything), "global" (only global), "project" (only project-specific), ' +
+        '"combined" (global + specific project - requires projectId)'
       ),
       limit: z.number().min(1).max(50).default(20).describe('Maximum articles to return'),
     }),
@@ -114,6 +126,8 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
       try {
         const articles = await knowledge.list({
           category: params.category,
+          projectId: params.projectId,
+          scope: params.scope,
           limit: params.limit,
         });
 
@@ -127,6 +141,8 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
           id: article.id,
           title: article.title,
           category: article.category,
+          projectId: article.projectId || null,
+          scope: article.projectId ? 'project' : 'global',
           updatedAt: article.updatedAt,
         }));
 
@@ -144,7 +160,8 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
     name: 'create_knowledge',
     description:
       'Create a new knowledge article. Use this to document decisions, ' +
-      'architecture, workflows, troubleshooting guides, and other team knowledge.',
+      'architecture, workflows, troubleshooting guides, and other team knowledge. ' +
+      'Omit projectId for global knowledge, or provide it for project-specific knowledge.',
     parameters: z.object({
       title: z.string().min(1).max(200).describe('Article title'),
       category: KnowledgeCategorySchema.describe(
@@ -152,6 +169,7 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
         'performance, workflow, conventions, troubleshooting, other'
       ),
       content: z.string().min(1).describe('Article content (markdown supported)'),
+      projectId: z.string().optional().describe('Project ID to associate with (omit for global knowledge)'),
     }),
     execute: async (params) => {
       try {
@@ -159,6 +177,7 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
           title: params.title,
           category: params.category,
           content: params.content,
+          projectId: params.projectId || null,
         });
 
         return JSON.stringify({
@@ -168,6 +187,8 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
             id: article.id,
             title: article.title,
             category: article.category,
+            projectId: article.projectId || null,
+            scope: article.projectId ? 'project' : 'global',
           },
         }, null, 2);
       } catch (error) {

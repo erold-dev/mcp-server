@@ -115,9 +115,14 @@ X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e
 |------|-------------|
 | `search_knowledge` | Search knowledge base |
 | `get_knowledge` | Get article content |
-| `list_knowledge` | List articles by category |
-| `create_knowledge` | Create new article |
+| `list_knowledge` | List articles by category/project (supports scope: all, global, project, combined) |
+| `create_knowledge` | Create new article (global or project-specific) |
 | `update_knowledge` | Update article |
+
+**Knowledge Scoping:**
+- `projectId: null` = Global knowledge (available to all projects)
+- `projectId: "<id>"` = Project-specific knowledge
+- Use `scope` parameter in list_knowledge: `all`, `global`, `project`, `combined`
 
 ---
 

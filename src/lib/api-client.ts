@@ -351,6 +351,106 @@ export const knowledge = {
     get(`${getTenantPath()}/knowledge`, { search: query }),
 };
 
+// --- Vault (Secrets) ---
+export interface VaultEntry {
+  id: string;
+  key: string;
+  value?: string;
+  category: string;
+  description?: string;
+  environment: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+}
+
+export const vault = {
+  list: (projectId: string): Promise<VaultEntry[]> =>
+    get(`${getTenantPath()}/projects/${projectId}/vault`),
+
+  get: (projectId: string, entryId: string): Promise<VaultEntry> =>
+    get(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`),
+
+  create: (projectId: string, data: {
+    key: string;
+    value: string;
+    category?: string;
+    description?: string;
+    environment?: string;
+  }): Promise<VaultEntry> =>
+    post(`${getTenantPath()}/projects/${projectId}/vault`, data),
+
+  update: (projectId: string, entryId: string, data: {
+    value?: string;
+    category?: string;
+    description?: string;
+    environment?: string;
+  }): Promise<VaultEntry> =>
+    patch(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`, data),
+
+  delete: (projectId: string, entryId: string): Promise<void> =>
+    del(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`),
+};
+
+// --- Tech Info ---
+export interface TechInfo {
+  stack?: {
+    frontend?: string[];
+    backend?: string[];
+    database?: string[];
+    languages?: string[];
+    tools?: string[];
+    other?: string[];
+  };
+  deployment?: {
+    provider?: string;
+    region?: string;
+    urls?: {
+      production?: string;
+      staging?: string;
+      development?: string;
+    };
+    cicd?: string;
+    branch?: {
+      production?: string;
+      staging?: string;
+    };
+  };
+  commands?: Array<{
+    name: string;
+    command: string;
+    description?: string;
+  }>;
+  infrastructure?: {
+    domains?: string[];
+    cdn?: string;
+    dns?: string;
+    ssl?: string;
+    monitoring?: string;
+    logging?: string;
+    errorTracking?: string;
+  };
+  repositories?: Array<{
+    name: string;
+    url: string;
+    branch?: string;
+    type?: string;
+  }>;
+  environments?: Record<string, { description?: string; url?: string }>;
+  notes?: string;
+  custom?: Record<string, unknown>;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export const techInfo = {
+  get: (projectId: string): Promise<TechInfo> =>
+    get(`${getTenantPath()}/projects/${projectId}/tech-info`),
+
+  update: (projectId: string, data: Partial<TechInfo>): Promise<TechInfo> =>
+    patch(`${getTenantPath()}/projects/${projectId}/tech-info`, data),
+};
+
 // --- Context ---
 export const context = {
   get: (): Promise<AIContext> =>
@@ -403,6 +503,8 @@ export default {
   tasks,
   projects,
   knowledge,
+  vault,
+  techInfo,
   context,
   members,
   activity,

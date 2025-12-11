@@ -113,6 +113,7 @@ export interface KnowledgeArticle {
   category: KnowledgeCategory;
   content: string;
   tags?: string[];
+  projectId?: string | null; // null = global, string = project-specific
   createdAt: string;
   updatedAt: string;
 }

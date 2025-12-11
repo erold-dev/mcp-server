@@ -10,6 +10,8 @@ import {
   registerProjectTools,
   registerContextTools,
   registerKnowledgeTools,
+  registerVaultTools,
+  registerTechInfoTools,
 } from './tools/index.js';
 
 /**
@@ -26,6 +28,8 @@ export function createServer(): FastMCP {
   registerProjectTools(server);
   registerContextTools(server);
   registerKnowledgeTools(server);
+  registerVaultTools(server);
+  registerTechInfoTools(server);
 
   return server;
 }
