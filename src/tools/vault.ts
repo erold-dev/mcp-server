@@ -30,6 +30,11 @@ const VaultEnvironmentSchema = z.enum([
   'development',
 ]);
 
+const VaultScopeSchema = z.enum([
+  'personal',
+  'shared',
+]);
+
 // =============================================================================
 // Tool Registration
 // =============================================================================
@@ -42,7 +47,7 @@ export function registerVaultTools(mcp: FastMCP): void {
     name: 'list_vault',
     description:
       'List vault entries for a project. Returns metadata only (not secret values). ' +
-      'Use get_vault_secret to retrieve actual values. Requires admin/owner role.',
+      'Shows personal secrets (your own) and shared secrets. Use get_vault_secret to retrieve actual values.',
     parameters: z.object({
       projectId: z.string().describe('The project ID'),
     }),
@@ -57,10 +62,13 @@ export function registerVaultTools(mcp: FastMCP): void {
         const formatted = entries.map((entry) => ({
           id: entry.id,
           key: entry.key,
+          scope: entry.scope || 'shared',
           category: entry.category,
           environment: entry.environment,
           description: entry.description || '',
-          updatedAt: entry.updatedAt,
+          isOwner: entry.isOwner,
+          canRead: entry.canRead,
+          canEdit: entry.canEdit,
         }));
 
         return JSON.stringify({
@@ -112,7 +120,7 @@ export function registerVaultTools(mcp: FastMCP): void {
     name: 'create_vault_secret',
     description:
       'Create a new vault entry to store a secret. Keys must be uppercase with underscores ' +
-      '(e.g., DATABASE_URL, API_KEY). The secret is encrypted and stored securely.',
+      '(e.g., DATABASE_URL, API_KEY). Use scope=personal for private secrets or scope=shared for team secrets (admin only).',
     parameters: z.object({
       projectId: z.string().describe('The project ID'),
       key: z.string()
@@ -120,6 +128,9 @@ export function registerVaultTools(mcp: FastMCP): void {
         .max(100)
         .describe('Secret key in UPPERCASE_WITH_UNDERSCORES format (e.g., DATABASE_URL)'),
       value: z.string().min(1).describe('The secret value to store'),
+      scope: VaultScopeSchema.optional().describe(
+        'Scope: personal (only you can access) or shared (team access, admin only). Default: personal'
+      ),
       category: VaultCategorySchema.optional().describe(
         'Category: database, api, cloud, service, credential, other'
       ),
@@ -141,6 +152,7 @@ export function registerVaultTools(mcp: FastMCP): void {
         const entry = await vault.create(params.projectId, {
           key: formattedKey,
           value: params.value,
+          scope: params.scope || 'personal',
           category: params.category || 'other',
           description: params.description,
           environment: params.environment || 'all',
@@ -152,6 +164,7 @@ export function registerVaultTools(mcp: FastMCP): void {
           entry: {
             id: entry.id,
             key: entry.key,
+            scope: entry.scope,
             category: entry.category,
             environment: entry.environment,
           },
