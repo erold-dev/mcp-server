@@ -6,7 +6,7 @@
 
 import type { ApiConfig } from '../types/index.js';
 
-const DEFAULT_API_URL = 'https://yetwork-project.web.app/api/v1';
+const DEFAULT_API_URL = 'https://api.yet.watch/api/v1';
 
 /**
  * Get configuration from environment variables

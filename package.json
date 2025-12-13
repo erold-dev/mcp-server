@@ -1,5 +1,5 @@
 {
-  "name": "@yet/mcp-server",
+  "name": "yet-mcp-server",
   "version": "0.1.0",
   "description": "MCP Server for Yet.Project - AI-native project management",
   "type": "module",

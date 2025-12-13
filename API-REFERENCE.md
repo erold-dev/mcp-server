@@ -12,7 +12,7 @@ npm install -g @yet/mcp-server
 |----------|-------|
 | `YET_API_KEY` | `yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e` |
 | `YET_TENANT` | `RcMRG8RZ7L7Ei0jL3UU9` |
-| `YET_API_URL` | `https://app.yet-project.com/api/v1` |
+| `YET_API_URL` | `https://api.yet.watch/api/v1` |
 
 ---
 
@@ -31,7 +31,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "env": {
         "YET_API_KEY": "yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e",
         "YET_TENANT": "RcMRG8RZ7L7Ei0jL3UU9",
-        "YET_API_URL": "https://app.yet-project.com/api/v1"
+        "YET_API_URL": "https://api.yet.watch/api/v1"
       }
     }
   }
@@ -48,7 +48,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "env": {
       "YET_API_KEY": "yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e",
       "YET_TENANT": "RcMRG8RZ7L7Ei0jL3UU9",
-      "YET_API_URL": "https://app.yet-project.com/api/v1"
+      "YET_API_URL": "https://api.yet.watch/api/v1"
     }
   }
 }
@@ -59,7 +59,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ## API Base URL
 
 ```
-https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9
+https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9
 ```
 
 ## Authentication Header
@@ -128,7 +128,7 @@ X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e
 
 ## REST API Endpoints
 
-**Base**: `https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9`
+**Base**: `https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9`
 
 ### Projects
 
@@ -179,28 +179,28 @@ GET    /members                     # Team members
 ```bash
 # List projects
 curl -H "X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e" \
-  "https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/projects"
+  "https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/projects"
 
 # Get project tasks
 curl -H "X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e" \
-  "https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/projects/FWOi8ULJE2XSSKE6Vq6S/tasks"
+  "https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/projects/FWOi8ULJE2XSSKE6Vq6S/tasks"
 
 # Create task
 curl -X POST -H "X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e" \
   -H "Content-Type: application/json" \
-  "https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/projects/FWOi8ULJE2XSSKE6Vq6S/tasks" \
+  "https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/projects/FWOi8ULJE2XSSKE6Vq6S/tasks" \
   -d '{"title": "My task", "priority": "high"}'
 
 # Update task status
 curl -X PATCH -H "X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e" \
   -H "Content-Type: application/json" \
-  "https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/tasks/TASK_ID" \
+  "https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/tasks/TASK_ID" \
   -d '{"status": "inProgress"}'
 
 # Add comment to task
 curl -X POST -H "X-API-Key: yet_MNSA6nzfJlbB4BcmEPSI6mrjx29hN3th3I5uZhlSFr6xwg2e" \
   -H "Content-Type: application/json" \
-  "https://app.yet-project.com/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/tasks/TASK_ID/comments" \
+  "https://api.yet.watch/api/v1/tenants/RcMRG8RZ7L7Ei0jL3UU9/tasks/TASK_ID/comments" \
   -d '{"content": "Started working on this"}'
 ```
 
