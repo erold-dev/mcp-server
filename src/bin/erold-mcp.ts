@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Yet.Project MCP Server - CLI Entry Point
+ * Erold MCP Server - CLI Entry Point
  *
  * This is the executable that gets run when users invoke:
- *   npx @yet/mcp-server
- *   yet-mcp
+ *   npx @erold/mcp-server
+ *   erold-mcp
  */
 
 import { startServer } from '../server.js';

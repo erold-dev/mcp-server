@@ -1,5 +1,5 @@
 /**
- * Yet.Project MCP Server - Type Definitions
+ * Erold MCP Server - Type Definitions
  */
 
 // =============================================================================

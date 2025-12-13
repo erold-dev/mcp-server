@@ -1,19 +1,19 @@
 {
-  "name": "yet-mcp-server",
-  "version": "0.1.0",
-  "description": "MCP Server for Yet.Project - AI-native project management",
+  "name": "@erold/mcp-server",
+  "version": "0.1.1",
+  "description": "MCP Server for Erold - AI-native project management",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "yet-mcp": "dist/bin/yet-mcp.js"
+    "erold-mcp": "dist/bin/erold-mcp.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts src/bin/yet-mcp.ts --format esm --dts --clean",
+    "build": "tsup src/index.ts src/bin/erold-mcp.ts --format esm --dts --clean",
     "start": "node dist/index.js",
     "inspect": "npx @modelcontextprotocol/inspector tsx src/index.ts",
     "test": "vitest run",
@@ -25,18 +25,19 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "yet-project",
+    "erold",
     "project-management",
     "ai",
     "claude",
     "anthropic"
   ],
-  "author": "Yet.Project",
+  "author": "Erold",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yet-project/mcp-server"
+    "url": "https://github.com/erold-dev/mcp-server"
   },
+  "homepage": "https://erold.dev",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -52,5 +53,8 @@
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
     "vitest": "^4.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

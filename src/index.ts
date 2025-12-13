@@ -1,5 +1,5 @@
 /**
- * Yet.Project MCP Server
+ * Erold MCP Server
  *
  * Main entry point - starts the MCP server.
  */

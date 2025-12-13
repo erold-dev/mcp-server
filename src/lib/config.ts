@@ -6,26 +6,26 @@
 
 import type { ApiConfig } from '../types/index.js';
 
-const DEFAULT_API_URL = 'https://api.yet.watch/api/v1';
+const DEFAULT_API_URL = 'https://api.erold.dev/api/v1';
 
 /**
  * Get configuration from environment variables
  */
 export function getConfig(): ApiConfig {
-  const apiKey = process.env.YET_API_KEY;
-  const tenant = process.env.YET_TENANT;
-  const apiUrl = process.env.YET_API_URL || DEFAULT_API_URL;
+  const apiKey = process.env.EROLD_API_KEY;
+  const tenant = process.env.EROLD_TENANT;
+  const apiUrl = process.env.EROLD_API_URL || DEFAULT_API_URL;
 
   if (!apiKey) {
     throw new Error(
-      'YET_API_KEY environment variable is required.\n' +
-        'Get your API key from: Settings > API Keys in Yet.Project'
+      'EROLD_API_KEY environment variable is required.\n' +
+        'Get your API key from: Settings > API Keys in Erold'
     );
   }
 
   if (!tenant) {
     throw new Error(
-      'YET_TENANT environment variable is required.\n' +
+      'EROLD_TENANT environment variable is required.\n' +
         'Set this to your tenant ID or slug.'
     );
   }

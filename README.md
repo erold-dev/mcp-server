@@ -1,6 +1,6 @@
-# @yet/mcp-server
+# @erold/mcp-server
 
-MCP (Model Context Protocol) server for Yet.Project - enabling AI agents to manage projects, tasks, and knowledge autonomously.
+MCP (Model Context Protocol) server for Erold - enabling AI agents to manage projects, tasks, and knowledge autonomously.
 
 ## Features
 
@@ -14,11 +14,11 @@ MCP (Model Context Protocol) server for Yet.Project - enabling AI agents to mana
 
 ```bash
 # Run directly with npx
-npx @yet/mcp-server
+npx @erold/mcp-server
 
 # Or install globally
-npm install -g @yet/mcp-server
-yet-mcp
+npm install -g @erold/mcp-server
+erold-mcp
 ```
 
 ## Configuration
@@ -27,16 +27,16 @@ yet-mcp
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `YET_API_KEY` | Yes | Your Yet.Project API key |
-| `YET_TENANT` | Yes | Your tenant ID or slug |
-| `YET_API_URL` | No | API URL (default: production) |
+| `EROLD_API_KEY` | Yes | Your Erold API key |
+| `EROLD_TENANT` | Yes | Your tenant ID or slug |
+| `EROLD_API_URL` | No | API URL (default: production) |
 
 ### Get Your API Key
 
-1. Log in to Yet.Project
+1. Log in to Erold
 2. Go to **Settings > API Keys**
 3. Create a new API key
-4. Copy the key (starts with `yet_`)
+4. Copy the key (starts with `erold_`)
 
 ## Usage with MCP Clients
 
@@ -47,12 +47,12 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "yet-project": {
+    "erold": {
       "command": "npx",
-      "args": ["@yet/mcp-server"],
+      "args": ["@erold/mcp-server"],
       "env": {
-        "YET_API_KEY": "yet_your_api_key_here",
-        "YET_TENANT": "your-tenant-id"
+        "EROLD_API_KEY": "erold_your_api_key_here",
+        "EROLD_TENANT": "your-tenant-id"
       }
     }
   }
@@ -65,12 +65,12 @@ Add to your MCP settings:
 
 ```json
 {
-  "yet-project": {
+  "erold": {
     "command": "npx",
-    "args": ["@yet/mcp-server"],
+    "args": ["@erold/mcp-server"],
     "env": {
-      "YET_API_KEY": "yet_your_api_key_here",
-      "YET_TENANT": "your-tenant-id"
+      "EROLD_API_KEY": "erold_your_api_key_here",
+      "EROLD_TENANT": "your-tenant-id"
     }
   }
 }
@@ -188,8 +188,8 @@ npm test
 
 ```bash
 # Set environment variables
-export YET_API_KEY="yet_your_key"
-export YET_TENANT="your-tenant"
+export EROLD_API_KEY="erold_your_key"
+export EROLD_TENANT="your-tenant"
 
 # Run inspector
 npm run inspect
@@ -198,13 +198,13 @@ npm run inspect
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   MCP Client    │────►│  @yet/mcp-server │────►│  Yet.Project    │
-│ (Any MCP client)│stdio│   (This package) │https│     API         │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   MCP Client    │────►│ @erold/mcp-server │────►│   Erold API     │
+│ (Any MCP client)│stdio│   (This package)  │https│                 │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
 ```
 
-The server acts as a translator between the MCP protocol and the Yet.Project REST API.
+The server acts as a translator between the MCP protocol and the Erold REST API.
 
 ## License
 

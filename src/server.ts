@@ -1,5 +1,5 @@
 /**
- * Yet.Project MCP Server
+ * Erold MCP Server
  *
  * FastMCP server configuration and setup.
  */
@@ -19,7 +19,7 @@ import {
  */
 export function createServer(): FastMCP {
   const server = new FastMCP({
-    name: 'yet-project',
+    name: 'erold',
     version: '0.1.0',
   });
 

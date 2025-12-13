@@ -1,7 +1,7 @@
 /**
- * Yet.Project API Client
+ * Erold API Client
  *
- * HTTP client for communicating with the Yet.Project REST API.
+ * HTTP client for communicating with the Erold REST API.
  * Handles authentication, retries, and error handling.
  */
 
@@ -92,7 +92,7 @@ async function request<T>(
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
-    'User-Agent': '@yet/mcp-server/0.1.0',
+    'User-Agent': '@erold/mcp-server/0.1.0',
     ...(options.headers as Record<string, string>),
   };
 

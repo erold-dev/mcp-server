@@ -36,7 +36,7 @@ export function registerTaskTools(mcp: FastMCP): void {
   mcp.addTool({
     name: 'list_tasks',
     description:
-      'List tasks from Yet.Project. Can filter by project, status, assignee, or priority. ' +
+      'List tasks from Erold. Can filter by project, status, assignee, or priority. ' +
       'Returns an array of tasks with their details.',
     parameters: z.object({
       projectId: z.string().optional().describe('Filter by project ID'),
