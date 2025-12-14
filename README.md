@@ -1,48 +1,60 @@
+<div align="center">
+
 # @erold/mcp-server
 
-MCP (Model Context Protocol) server for Erold - enabling AI agents to manage projects, tasks, and knowledge autonomously.
+**MCP server for AI-powered project management**
 
-## Features
+[![npm version](https://img.shields.io/npm/v/@erold/mcp-server.svg)](https://www.npmjs.com/package/@erold/mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io)
 
-- **Task Management**: Create, update, complete, block tasks
-- **Project Management**: Create projects, track progress, view stats
-- **Knowledge Base**: Search, create, update documentation
-- **AI Context**: Get workspace context, dashboard, workload data
-- **Team Visibility**: View team members and workload distribution
+Let Claude, Cursor, and other AI assistants manage your Erold projects directly.
 
-## Installation
+[Website](https://erold.dev) · [Documentation](https://erold.dev/docs/mcp) · [Report Bug](https://github.com/erold-dev/mcp-server/issues)
 
-```bash
-# Run directly with npx
-npx @erold/mcp-server
+</div>
 
-# Or install globally
-npm install -g @erold/mcp-server
-erold-mcp
+---
+
+## What is This?
+
+This MCP (Model Context Protocol) server connects AI assistants to Erold, enabling them to:
+
+- Create and manage tasks
+- Track project progress
+- Access your knowledge base
+- Update status as they work
+
+No more copy-pasting between your AI assistant and project management tools.
+
+## How It Works
+
+```
+┌─────────────────┐        ┌──────────────────┐        ┌─────────────────┐
+│   AI Assistant  │  MCP   │  @erold/mcp-server │  API  │   Erold Cloud   │
+│  (Claude, etc.) │───────►│    (This package) │───────►│                 │
+└─────────────────┘        └──────────────────┘        └─────────────────┘
 ```
 
-## Configuration
+Your AI can now say things like:
 
-### Environment Variables
+> "Create a task for implementing OAuth in the Backend project"
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `EROLD_API_KEY` | Yes | Your Erold API key |
-| `EROLD_TENANT` | Yes | Your tenant ID or slug |
-| `EROLD_API_URL` | No | API URL (default: production) |
+And it actually happens.
 
-### Get Your API Key
+## Quick Start
 
-1. Log in to Erold
-2. Go to **Settings > API Keys**
-3. Create a new API key
-4. Copy the key (starts with `erold_`)
+### 1. Get Your API Key
 
-## Usage with MCP Clients
+1. Log in to [app.erold.dev](https://app.erold.dev)
+2. Go to **Settings → API Keys**
+3. Create a new key (starts with `erold_`)
 
-### Claude Desktop
+### 2. Configure Your AI Assistant
 
-Add to your `claude_desktop_config.json`:
+#### Claude Desktop
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -51,7 +63,7 @@ Add to your `claude_desktop_config.json`:
       "command": "npx",
       "args": ["@erold/mcp-server"],
       "env": {
-        "EROLD_API_KEY": "erold_your_api_key_here",
+        "EROLD_API_KEY": "erold_your_api_key",
         "EROLD_TENANT": "your-tenant-id"
       }
     }
@@ -59,9 +71,9 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### Claude Code (VS Code)
+#### Claude Code (VS Code Extension)
 
-Add to your MCP settings:
+Add to your MCP configuration:
 
 ```json
 {
@@ -69,31 +81,48 @@ Add to your MCP settings:
     "command": "npx",
     "args": ["@erold/mcp-server"],
     "env": {
-      "EROLD_API_KEY": "erold_your_api_key_here",
+      "EROLD_API_KEY": "erold_your_api_key",
       "EROLD_TENANT": "your-tenant-id"
     }
   }
 }
 ```
 
-### Other MCP Clients
+#### Cursor
 
-The server uses stdio transport and works with any MCP-compatible client including:
-- Cursor
-- Windsurf
-- Cline
-- Continue.dev
-- Custom AI agents
+Add to your Cursor MCP settings:
+
+```json
+{
+  "erold": {
+    "command": "npx",
+    "args": ["@erold/mcp-server"],
+    "env": {
+      "EROLD_API_KEY": "erold_your_api_key",
+      "EROLD_TENANT": "your-tenant-id"
+    }
+  }
+}
+```
+
+### 3. Start Using It
+
+Ask your AI assistant:
+
+- "What tasks are assigned to me?"
+- "Create a high-priority task for fixing the login bug"
+- "Mark task TASK-123 as complete"
+- "What's the status of the Backend API project?"
 
 ## Available Tools
 
-### Task Tools
+### Task Management
 
 | Tool | Description |
 |------|-------------|
 | `list_tasks` | List tasks with filters (project, status, priority, assignee) |
 | `get_task` | Get detailed task information |
-| `create_task` | Create a new task in a project |
+| `create_task` | Create a new task |
 | `update_task` | Update task fields |
 | `start_task` | Start working on a task |
 | `complete_task` | Mark task as complete |
@@ -103,7 +132,7 @@ The server uses stdio transport and works with any MCP-compatible client includi
 | `get_task_comments` | Get all comments on a task |
 | `get_blocked_tasks` | Get all blocked tasks |
 
-### Project Tools
+### Project Management
 
 | Tool | Description |
 |------|-------------|
@@ -114,17 +143,7 @@ The server uses stdio transport and works with any MCP-compatible client includi
 | `get_project_stats` | Get project statistics |
 | `get_project_tasks` | Get tasks in a project |
 
-### Context Tools
-
-| Tool | Description |
-|------|-------------|
-| `get_context` | Get AI-ready workspace context (most important!) |
-| `get_dashboard` | Get dashboard overview |
-| `get_stats` | Get workspace statistics |
-| `get_workload` | Get team workload distribution |
-| `list_members` | List team members |
-
-### Knowledge Tools
+### Knowledge Base
 
 | Tool | Description |
 |------|-------------|
@@ -134,57 +153,108 @@ The server uses stdio transport and works with any MCP-compatible client includi
 | `create_knowledge` | Create new article |
 | `update_knowledge` | Update existing article |
 
-## Example Workflows
+### Context & Insights
 
-### AI Agent Starting Work
+| Tool | Description |
+|------|-------------|
+| `get_context` | Get AI-ready workspace context |
+| `get_dashboard` | Get dashboard overview |
+| `get_stats` | Get workspace statistics |
+| `get_workload` | Get team workload distribution |
+| `list_members` | List team members |
 
-```
-1. get_context()        → Understand current state
-2. list_projects()      → See available projects
-3. list_tasks()         → Find tasks to work on
-4. start_task()         → Begin working
-5. add_task_comment()   → Document progress
-6. complete_task()      → Mark done
-```
+## Example Conversations
 
-### Creating a Feature
+### Starting a Coding Session
 
-```
-1. create_project()     → New project for the feature
-2. create_task() x N    → Break into tasks
-3. create_knowledge()   → Document the approach
-4. start_task()         → Begin implementation
-```
+**You:** "What should I work on today?"
 
-### Reviewing Blockers
+**Claude:** *Uses `get_context` and `list_tasks`*
 
-```
-1. get_blocked_tasks()  → See what's stuck
-2. get_task()           → Get blocker details
-3. add_task_comment()   → Propose solution
-4. update_task()        → Unblock if resolved
-```
+> "You have 3 high-priority tasks:
+> 1. TASK-45: Fix authentication timeout (Backend API)
+> 2. TASK-52: Add input validation (Backend API)  
+> 3. TASK-58: Update API documentation (Documentation)
+>
+> I'd suggest starting with TASK-45 since it's blocking other work."
+
+**You:** "Start working on task 45"
+
+**Claude:** *Uses `start_task`*
+
+> "Started TASK-45. I've updated the status to 'In Progress' and assigned it to you."
+
+### Creating Tasks
+
+**You:** "Break down the OAuth implementation into tasks"
+
+**Claude:** *Uses `create_task` multiple times*
+
+> "I've created the following tasks in the Backend API project:
+> 1. TASK-78: Set up OAuth provider configuration
+> 2. TASK-79: Implement authorization endpoint
+> 3. TASK-80: Add token refresh logic
+> 4. TASK-81: Write OAuth integration tests
+>
+> All set to high priority."
+
+### End of Day
+
+**You:** "Update my progress - I finished the auth timeout fix and made 50% progress on validation"
+
+**Claude:** *Uses `complete_task` and `update_task`*
+
+> "Done! TASK-45 is now complete, and I've updated TASK-52 to 50% progress."
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `EROLD_API_KEY` | Yes | Your Erold API key (starts with `erold_`) |
+| `EROLD_TENANT` | Yes | Your tenant ID or slug |
+| `EROLD_API_URL` | No | Custom API URL (default: production) |
+
+### Finding Your Tenant ID
+
+1. Log in to [app.erold.dev](https://app.erold.dev)
+2. Go to **Settings → Workspace**
+3. Copy your tenant ID or slug
+
+## Supported AI Assistants
+
+Works with any MCP-compatible client:
+
+- **Claude Desktop** — Anthropic's desktop app
+- **Claude Code** — VS Code extension
+- **Cursor** — AI-first code editor
+- **Windsurf** — Codeium's AI IDE
+- **Cline** — VS Code AI assistant
+- **Continue.dev** — Open source AI assistant
+- **Custom agents** — Any MCP-compatible implementation
 
 ## Development
 
 ```bash
+# Clone the repo
+git clone https://github.com/erold-dev/mcp-server.git
+cd mcp-server
+
 # Install dependencies
 npm install
-
-# Run in development mode
-npm run dev
 
 # Build
 npm run build
 
-# Test with MCP Inspector
-npm run inspect
-
 # Run tests
 npm test
+
+# Run locally
+npm start
 ```
 
-## Testing with MCP Inspector
+### Testing with MCP Inspector
 
 ```bash
 # Set environment variables
@@ -195,17 +265,37 @@ export EROLD_TENANT="your-tenant"
 npm run inspect
 ```
 
-## Architecture
+## Troubleshooting
 
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   MCP Client    │────►│ @erold/mcp-server │────►│   Erold API     │
-│ (Any MCP client)│stdio│   (This package)  │https│                 │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-```
+### "API key invalid"
 
-The server acts as a translator between the MCP protocol and the Erold REST API.
+- Verify your key starts with `erold_`
+- Check the key hasn't expired in Settings → API Keys
+- Ensure you're using the correct tenant ID
+
+### "Connection refused"
+
+- Check your internet connection
+- Verify the API URL if using a custom one
+- Try restarting your AI assistant
+
+### Tools not appearing
+
+- Restart your AI assistant after config changes
+- Verify the config file path is correct
+- Check for JSON syntax errors in config
+
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Related
+
+- [@erold/cli](https://github.com/erold-dev/cli) — Command-line interface
+- [Erold Web App](https://app.erold.dev) — Full web interface
+- [Documentation](https://erold.dev/docs) — Complete documentation
+- [MCP Specification](https://modelcontextprotocol.io) — Model Context Protocol
 
 ## License
 
-MIT
+MIT © [Erold](https://erold.dev)
