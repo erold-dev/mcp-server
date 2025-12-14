@@ -1,0 +1,10 @@
+# Default owners for everything in the repo
+* @erold-dev/maintainers
+
+# Package configuration
+package.json @erold-dev/maintainers
+package-lock.json @erold-dev/maintainers
+tsconfig.json @erold-dev/maintainers
+
+# CI/CD configuration
+.github/ @erold-dev/maintainers
