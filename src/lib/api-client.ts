@@ -20,58 +20,17 @@ import type {
   Member,
   Activity,
   Tenant,
-  TokenResponse,
 } from '../types/index.js';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
-// Token cache
-let cachedToken: string | null = null;
-let tokenExpiresAt: number | null = null;
-
 /**
  * Sleep helper for retries
  */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Get authentication token (exchanges API key for Firebase token)
- */
-async function getAuthToken(): Promise<string> {
-  // Check cache
-  if (cachedToken && tokenExpiresAt && Date.now() < tokenExpiresAt) {
-    return cachedToken;
-  }
-
-  const config = getConfig();
-
-  const response = await fetch(`${config.apiUrl}/auth/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': config.apiKey,
-    },
-  });
-
-  if (!response.ok) {
-    const message = response.status === 401
-      ? 'Invalid API key'
-      : `Authentication failed: ${response.status}`;
-    throw ApiError.unauthorized(message);
-  }
-
-  const data = await response.json() as { data: TokenResponse };
-  const tokenData = data.data;
-
-  // Cache token (with 5 minute buffer)
-  cachedToken = tokenData.token;
-  tokenExpiresAt = Date.now() + (tokenData.expiresIn - 300) * 1000;
-
-  return tokenData.token;
 }
 
 /**
@@ -82,7 +41,6 @@ async function request<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const config = getConfig();
-  const token = await getAuthToken();
 
   const url = `${config.apiUrl}${endpoint}`;
 
@@ -91,7 +49,7 @@ async function request<T>(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    'X-API-Key': config.apiKey,
     'User-Agent': '@erold/mcp-server/0.1.0',
     ...(options.headers as Record<string, string>),
   };

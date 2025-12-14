@@ -52,6 +52,22 @@ And it actually happens.
 
 ### 2. Configure Your AI Assistant
 
+#### Claude Code (Recommended)
+
+Run this command in your terminal:
+
+```bash
+claude mcp add-json erold '{"command":"npx","args":["-y","@erold/mcp-server@latest"],"env":{"EROLD_API_KEY":"YOUR_API_KEY","EROLD_TENANT":"YOUR_TENANT_ID"}}' --scope user
+```
+
+Verify the connection:
+
+```bash
+claude mcp list
+```
+
+You should see: `erold: npx -y @erold/mcp-server@latest - ✓ Connected`
+
 #### Claude Desktop
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
@@ -61,7 +77,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "erold": {
       "command": "npx",
-      "args": ["@erold/mcp-server"],
+      "args": ["-y", "@erold/mcp-server@latest"],
       "env": {
         "EROLD_API_KEY": "erold_your_api_key",
         "EROLD_TENANT": "your-tenant-id"
@@ -71,39 +87,26 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-#### Claude Code (VS Code Extension)
-
-Add to your MCP configuration:
-
-```json
-{
-  "erold": {
-    "command": "npx",
-    "args": ["@erold/mcp-server"],
-    "env": {
-      "EROLD_API_KEY": "erold_your_api_key",
-      "EROLD_TENANT": "your-tenant-id"
-    }
-  }
-}
-```
-
 #### Cursor
 
-Add to your Cursor MCP settings:
+Add to `.cursor/mcp.json`:
 
 ```json
 {
-  "erold": {
-    "command": "npx",
-    "args": ["@erold/mcp-server"],
-    "env": {
-      "EROLD_API_KEY": "erold_your_api_key",
-      "EROLD_TENANT": "your-tenant-id"
+  "mcpServers": {
+    "erold": {
+      "command": "npx",
+      "args": ["-y", "@erold/mcp-server@latest"],
+      "env": {
+        "EROLD_API_KEY": "erold_your_api_key",
+        "EROLD_TENANT": "your-tenant-id"
+      }
     }
   }
 }
 ```
+
+> **Important**: Use actual values for environment variables. Do NOT use `${EROLD_API_KEY}` syntax - Claude apps don't expand shell variables.
 
 ### 3. Start Using It
 
