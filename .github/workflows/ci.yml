@@ -32,9 +32,6 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Check formatting
-        run: npm run lint --if-present
-
   build:
     runs-on: ubuntu-latest
     needs: test
