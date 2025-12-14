@@ -321,7 +321,7 @@ export const projects = {
 
 // --- Knowledge ---
 export const knowledge = {
-  list: (params: { category?: string; limit?: number } = {}): Promise<KnowledgeArticle[]> =>
+  list: (params: { category?: string; projectId?: string; scope?: string; limit?: number } = {}): Promise<KnowledgeArticle[]> =>
     get(`${getTenantPath()}/knowledge`, params),
 
   get: (id: string): Promise<KnowledgeArticle> =>
@@ -334,6 +334,7 @@ export const knowledge = {
     title: string;
     category: string;
     content: string;
+    projectId?: string | null;
   }): Promise<KnowledgeArticle> =>
     post(`${getTenantPath()}/knowledge`, data),
 
@@ -359,6 +360,10 @@ export interface VaultEntry {
   category: string;
   description?: string;
   environment: string;
+  scope?: string;
+  isOwner?: boolean;
+  canRead?: boolean;
+  canEdit?: boolean;
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
@@ -374,6 +379,7 @@ export const vault = {
   create: (projectId: string, data: {
     key: string;
     value: string;
+    scope?: string;
     category?: string;
     description?: string;
     environment?: string;
