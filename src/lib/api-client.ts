@@ -246,26 +246,42 @@ export const tasks = {
 };
 
 // --- Projects ---
+// Note: Backend API uses 'title' but MCP uses 'name' - we map between them
 export const projects = {
-  list: (params: { status?: string } = {}): Promise<Project[]> =>
-    get(`${getTenantPath()}/projects`, params),
+  list: async (params: { status?: string } = {}): Promise<Project[]> => {
+    const results = await get<Array<{ id: string; title?: string; description?: string; status: string; slug?: string; taskCount?: number; completedTasks?: number; createdAt?: string; updatedAt?: string }>>(`${getTenantPath()}/projects`, params);
+    return results.map(p => ({ ...p, name: p.title || '' })) as Project[];
+  },
 
-  get: (id: string): Promise<Project> =>
-    get(`${getTenantPath()}/projects/${id}`),
+  get: async (id: string): Promise<Project> => {
+    const result = await get<{ id: string; title?: string; description?: string; status: string; slug?: string; taskCount?: number; completedTasks?: number; createdAt?: string; updatedAt?: string }>(`${getTenantPath()}/projects/${id}`);
+    return { ...result, name: result.title || '' } as Project;
+  },
 
-  create: (data: {
+  create: async (data: {
     name: string;
     description?: string;
     slug?: string;
-  }): Promise<Project> =>
-    post(`${getTenantPath()}/projects`, { ...data, status: 'planning' }),
+  }): Promise<Project> => {
+    // Map 'name' to 'title' for backend API
+    const result = await post<{ id: string; title?: string; description?: string; status: string; slug?: string }>(`${getTenantPath()}/projects`, { title: data.name, description: data.description, slug: data.slug, status: 'planning' });
+    return { ...result, name: result.title || '' } as Project;
+  },
 
-  update: (id: string, data: {
+  update: async (id: string, data: {
     name?: string;
     description?: string;
     status?: string;
-  }): Promise<Project> =>
-    patch(`${getTenantPath()}/projects/${id}`, data),
+  }): Promise<Project> => {
+    // Map 'name' to 'title' for backend API
+    const payload: Record<string, unknown> = {};
+    if (data.name) payload.title = data.name;
+    if (data.description !== undefined) payload.description = data.description;
+    if (data.status) payload.status = data.status;
+
+    const result = await patch<{ id: string; title?: string; description?: string; status: string; slug?: string }>(`${getTenantPath()}/projects/${id}`, payload);
+    return { ...result, name: result.title || '' } as Project;
+  },
 
   delete: (id: string): Promise<void> =>
     del(`${getTenantPath()}/projects/${id}`),
