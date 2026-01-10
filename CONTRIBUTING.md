@@ -33,14 +33,47 @@ To test your changes with Claude or other MCP-compatible assistants:
 2. Update your MCP configuration to point to your local build
 3. Restart your AI assistant
 
+## Git Workflow
+
+### Branching Strategy
+
+```
+main                    # Production-ready code
+├── feature/*           # New features (feature/add-tool)
+├── bugfix/*            # Bug fixes (bugfix/fix-auth)
+├── hotfix/*            # Urgent fixes (hotfix/security-patch)
+└── docs/*              # Documentation (docs/update-readme)
+```
+
+### Branch Naming
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Feature | `feature/short-description` | `feature/add-task-tool` |
+| Bug fix | `bugfix/short-description` | `bugfix/fix-token-refresh` |
+| Hotfix | `hotfix/short-description` | `hotfix/security-patch` |
+| Docs | `docs/short-description` | `docs/update-setup-guide` |
+
+### Commit Messages
+
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add new MCP tool for task creation
+fix: resolve authentication token refresh
+docs: update Claude integration guide
+chore: bump dependencies
+```
+
 ## Pull Request Process
 
-1. Ensure all tests pass before submitting
-2. Run type checking: `npx tsc --noEmit`
-3. Update documentation if needed
-4. Follow the existing code style
-5. Write meaningful commit messages
-6. Link any related issues in your PR description
+1. Create a branch from `main`
+2. Make your changes
+3. Ensure all tests pass: `npm test`
+4. Run type checking: `npx tsc --noEmit`
+5. Submit PR with clear description
+6. Address review feedback
+7. Squash merge to main
 
 ## Code Style
 
