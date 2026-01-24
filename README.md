@@ -117,6 +117,71 @@ Ask your AI assistant:
 - "Mark task TASK-123 as complete"
 - "What's the status of the Backend API project?"
 
+## Claude Code Plugin
+
+This package also functions as a **Claude Code plugin** with skills, agents, and hooks for the full Erold workflow.
+
+### Installation as Plugin
+
+```bash
+# Install directly from GitHub
+claude plugin install erold-dev/mcp-server --scope user
+
+# Or use locally during development
+claude --plugin-dir ./path/to/mcp-server
+```
+
+### Skills (Slash Commands)
+
+| Skill | Description |
+|-------|-------------|
+| `/erold:context` | Load workspace context (UNDERSTAND phase) |
+| `/erold:plan` | Create tasks from requirements (PLAN phase) |
+| `/erold:execute` | Work on a task with full context (EXECUTE phase) |
+| `/erold:learn` | Save learnings to knowledge base (LEARN phase) |
+| `/erold:guidelines` | Fetch coding guidelines for technologies |
+| `/erold:task` | Quick task operations (list, start, complete) |
+| `/erold:search` | Search tasks and knowledge |
+| `/erold:status` | Dashboard and progress overview |
+
+### Agents
+
+| Agent | Description |
+|-------|-------------|
+| `erold-workflow` | Enforces the 4-phase methodology |
+| `erold-reviewer` | Reviews code against guidelines |
+| `erold-learner` | Extracts patterns from completed work |
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/erold:init` | Initialize Erold in current project |
+| `/erold:sync` | Sync local work with Erold PM |
+| `/erold:report` | Generate progress report |
+
+### Hooks
+
+The plugin includes hooks for workflow enforcement:
+- **Session start**: Auto-load context
+- **Pre-edit**: Check for active task
+- **Post-edit**: Log activity
+- **Pre-commit**: Code review
+- **Task complete**: Suggest learnings
+
+### The Erold Methodology
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ UNDERSTAND  │ → │    PLAN     │ → │   EXECUTE   │ → │    LEARN    │
+│             │    │             │    │             │    │             │
+│ Load context│    │ Create tasks│    │ Implement   │    │ Capture     │
+│ Fetch info  │    │ Break down  │    │ Track work  │    │ patterns    │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+```
+
+---
+
 ## Available Tools
 
 ### Task Management
@@ -165,6 +230,14 @@ Ask your AI assistant:
 | `get_stats` | Get workspace statistics |
 | `get_workload` | Get team workload distribution |
 | `list_members` | List team members |
+
+### Guidelines
+
+| Tool | Description |
+|------|-------------|
+| `get_guidelines` | Fetch coding guidelines by category |
+| `list_guidelines` | List all available guidelines |
+| `search_guidelines` | Search across all guidelines |
 
 ## Example Conversations
 

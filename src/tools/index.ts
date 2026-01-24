@@ -10,3 +10,4 @@ export { registerContextTools } from './context.js';
 export { registerKnowledgeTools } from './knowledge.js';
 export { registerVaultTools } from './vault.js';
 export { registerTechInfoTools } from './tech-info.js';
+export { registerGuidelineTools } from './guidelines.js';
