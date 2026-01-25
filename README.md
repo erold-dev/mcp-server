@@ -119,17 +119,13 @@ Ask your AI assistant:
 
 ## Claude Code Plugin
 
-This package also functions as a **Claude Code plugin** with skills, agents, and hooks for the full Erold workflow.
-
-### Installation as Plugin
+For the full Erold experience with skills, agents, and hooks, install the dedicated Claude Code plugin:
 
 ```bash
-# Install directly from GitHub
-claude plugin install erold-dev/mcp-server --scope user
-
-# Or use locally during development
-claude --plugin-dir ./path/to/mcp-server
+claude plugin install erold-dev/claude-plugin --scope user
 ```
+
+> **Important:** Configure your credentials in `~/.claude/mcp.json` (not the plugin directory) so they survive plugin updates. See the [plugin setup guide](https://github.com/erold-dev/claude-plugin/blob/main/docs/SETUP.md).
 
 ### Skills (Slash Commands)
 
