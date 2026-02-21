@@ -7,7 +7,7 @@
 
 import { z } from 'zod';
 import type { FastMCP } from 'fastmcp';
-import { context, members } from '../lib/api-client.js';
+import { context, members, knowledge } from '../lib/api-client.js';
 import { formatError } from '../lib/errors.js';
 
 // =============================================================================
@@ -27,55 +27,85 @@ export function registerContextTools(mcp: FastMCP): void {
     parameters: z.object({}),
     execute: async () => {
       try {
-        const ctx = await context.get();
+        const ctx = await context.get() as Record<string, unknown>;
 
         const result: Record<string, unknown> = {};
 
         // Active project
         if (ctx.activeProject) {
+          const ap = ctx.activeProject as Record<string, unknown>;
           result.activeProject = {
-            id: ctx.activeProject.id,
-            name: ctx.activeProject.name,
-            status: ctx.activeProject.status,
-            description: ctx.activeProject.description || 'No description',
+            id: ap.id,
+            name: ap.name || ap.title,
+            status: ap.status,
+            description: ap.description || 'No description',
           };
         }
 
-        // Current tasks
-        if (ctx.currentTasks && ctx.currentTasks.length > 0) {
-          result.currentTasks = ctx.currentTasks.map((task) => ({
+        // Projects list (from improved context endpoint)
+        if (ctx.projects && Array.isArray(ctx.projects) && ctx.projects.length > 0) {
+          result.projects = (ctx.projects as Array<Record<string, unknown>>).map((p) => ({
+            id: p.id,
+            name: p.title || p.name,
+            status: p.status,
+            taskCounts: p.taskCounts,
+          }));
+        }
+
+        // Current tasks (my tasks)
+        const taskSource = ctx.currentTasks || ctx.myTasks;
+        if (taskSource && Array.isArray(taskSource) && taskSource.length > 0) {
+          result.currentTasks = (taskSource as Array<Record<string, unknown>>).map((task) => ({
             id: task.id,
             title: task.title,
             status: task.status,
             priority: task.priority,
+            projectId: task.projectId,
             assignee: task.assigneeName || task.assignedTo || 'Unassigned',
           }));
         }
 
-        // Blockers (important!)
-        if (ctx.blockers && ctx.blockers.length > 0) {
-          result.blockers = ctx.blockers.map((task) => ({
+        // Blockers
+        const blockerSource = ctx.blockers || ctx.blockedTasks;
+        if (blockerSource && Array.isArray(blockerSource) && blockerSource.length > 0) {
+          result.blockers = (blockerSource as Array<Record<string, unknown>>).map((task) => ({
             id: task.id,
             title: task.title,
-            reason: task.blockedReason || 'No reason provided',
+            reason: task.blockedReason || task.blockReason || 'No reason provided',
           }));
         }
 
         // Recent activity
-        if (ctx.recentActivity && ctx.recentActivity.length > 0) {
-          result.recentActivity = ctx.recentActivity.slice(0, 10).map((activity) => ({
+        if (ctx.recentActivity && Array.isArray(ctx.recentActivity) && ctx.recentActivity.length > 0) {
+          result.recentActivity = (ctx.recentActivity as Array<Record<string, unknown>>).slice(0, 10).map((activity) => ({
             description: activity.description,
             timestamp: activity.createdAt,
           }));
         }
 
-        // Relevant knowledge
-        if (ctx.relevantKnowledge && ctx.relevantKnowledge.length > 0) {
-          result.relevantKnowledge = ctx.relevantKnowledge.map((kb) => ({
+        // Knowledge articles (full list from improved endpoint)
+        if (ctx.knowledgeArticles && Array.isArray(ctx.knowledgeArticles) && ctx.knowledgeArticles.length > 0) {
+          result.knowledgeArticles = (ctx.knowledgeArticles as Array<Record<string, unknown>>).map((kb) => ({
+            id: kb.id,
+            title: kb.title,
+            category: kb.category,
+            projectId: kb.projectId || null,
+            tags: kb.tags || [],
+            preview: kb.preview,
+            updatedAt: kb.updatedAt,
+          }));
+        } else if (ctx.relevantKnowledge && Array.isArray(ctx.relevantKnowledge) && ctx.relevantKnowledge.length > 0) {
+          // Fallback to old format
+          result.knowledgeArticles = (ctx.relevantKnowledge as Array<Record<string, unknown>>).map((kb) => ({
             id: kb.id,
             title: kb.title,
             category: kb.category,
           }));
+        }
+
+        // Knowledge by category summary (backward compat)
+        if (ctx.knowledge && typeof ctx.knowledge === 'object') {
+          result.knowledgeSummary = ctx.knowledge;
         }
 
         if (Object.keys(result).length === 0) {

@@ -218,6 +218,8 @@ export const tasks = {
     status?: string;
     priority?: string;
     assignedTo?: string;
+    blockedBy?: string[];
+    blockReason?: string;
   }): Promise<Task> =>
     patch(`${getTenantPath()}/tasks/${id}`, data),
 

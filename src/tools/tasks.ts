@@ -395,6 +395,51 @@ export function registerTaskTools(mcp: FastMCP): void {
   });
 
   // ---------------------------------------------------------------------------
+  // link_tasks - Set task dependencies (blockedBy)
+  // ---------------------------------------------------------------------------
+  mcp.addTool({
+    name: 'link_tasks',
+    description:
+      'Link tasks by setting dependency relationships. ' +
+      'A blocked task cannot proceed until its blocking tasks are completed. ' +
+      'Use this to establish task order and dependencies.',
+    parameters: z.object({
+      taskId: z.string().describe('The task ID that is blocked'),
+      blockedBy: z.array(z.string()).describe('Array of task IDs that block this task'),
+      reason: z.string().optional().describe('Optional reason for the dependency'),
+    }),
+    execute: async (params) => {
+      try {
+        const updates: Record<string, unknown> = {
+          blockedBy: params.blockedBy,
+        };
+
+        if (params.blockedBy.length > 0) {
+          updates.status = 'blocked';
+          if (params.reason) {
+            updates.blockReason = params.reason;
+          }
+        }
+
+        const task = await tasks.update(params.taskId, updates);
+
+        return JSON.stringify({
+          success: true,
+          message: `Task dependencies updated`,
+          task: {
+            id: task.id,
+            title: task.title,
+            status: task.status,
+            blockedBy: params.blockedBy,
+          },
+        }, null, 2);
+      } catch (error) {
+        return `Error linking tasks: ${formatError(error)}`;
+      }
+    },
+  });
+
+  // ---------------------------------------------------------------------------
   // get_blocked_tasks - Get all blocked tasks
   // ---------------------------------------------------------------------------
   mcp.addTool({

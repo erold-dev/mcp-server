@@ -23,6 +23,11 @@ const KnowledgeCategorySchema = z.enum([
   'workflow',
   'conventions',
   'troubleshooting',
+  'vision',
+  'spec',
+  'research',
+  'decision',
+  'design',
   'other',
 ]);
 
@@ -113,7 +118,7 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
     parameters: z.object({
       category: KnowledgeCategorySchema.optional().describe(
         'Filter by category: architecture, api, deployment, testing, security, ' +
-        'performance, workflow, conventions, troubleshooting, other'
+        'performance, workflow, conventions, troubleshooting, vision, spec, research, decision, design, other'
       ),
       projectId: z.string().optional().describe('Filter by project ID'),
       scope: KnowledgeScopeSchema.optional().describe(
@@ -154,6 +159,70 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
   });
 
   // ---------------------------------------------------------------------------
+  // get_project_knowledge - Get ALL knowledge for a project in one call
+  // ---------------------------------------------------------------------------
+  mcp.addTool({
+    name: 'get_project_knowledge',
+    description:
+      'Get ALL knowledge articles for a specific project in one call. ' +
+      'Returns both project-specific and global articles. ' +
+      'Use this when starting work on a project to load full context.',
+    parameters: z.object({
+      projectId: z.string().describe('The project ID to get knowledge for'),
+      includeContent: z.boolean().default(false).describe(
+        'If true, includes full article content. If false (default), includes only a preview.'
+      ),
+    }),
+    execute: async (params) => {
+      try {
+        const articles = await knowledge.list({
+          projectId: params.projectId,
+          scope: 'combined',
+          limit: 50,
+        });
+
+        if (articles.length === 0) {
+          return 'No knowledge articles found for this project.';
+        }
+
+        // Group by category
+        const byCategory: Record<string, Array<{
+          id: string;
+          title: string;
+          scope: string;
+          tags?: string[];
+          content?: string;
+          preview?: string;
+          updatedAt: string;
+        }>> = {};
+
+        articles.forEach((article) => {
+          const cat = article.category || 'other';
+          if (!byCategory[cat]) byCategory[cat] = [];
+          byCategory[cat].push({
+            id: article.id,
+            title: article.title,
+            scope: article.projectId ? 'project' : 'global',
+            tags: article.tags || [],
+            ...(params.includeContent
+              ? { content: article.content }
+              : { preview: article.content.substring(0, 200) + (article.content.length > 200 ? '...' : '') }),
+            updatedAt: article.updatedAt,
+          });
+        });
+
+        return JSON.stringify({
+          projectId: params.projectId,
+          totalArticles: articles.length,
+          byCategory,
+        }, null, 2);
+      } catch (error) {
+        return `Error getting project knowledge: ${formatError(error)}`;
+      }
+    },
+  });
+
+  // ---------------------------------------------------------------------------
   // create_knowledge - Create a new article
   // ---------------------------------------------------------------------------
   mcp.addTool({
@@ -166,7 +235,7 @@ export function registerKnowledgeTools(mcp: FastMCP): void {
       title: z.string().min(1).max(200).describe('Article title'),
       category: KnowledgeCategorySchema.describe(
         'Category: architecture, api, deployment, testing, security, ' +
-        'performance, workflow, conventions, troubleshooting, other'
+        'performance, workflow, conventions, troubleshooting, vision, spec, research, decision, design, other'
       ),
       content: z.string().min(1).describe('Article content (markdown supported)'),
       projectId: z.string().optional().describe('Project ID to associate with (omit for global knowledge)'),

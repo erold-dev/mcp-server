@@ -105,6 +105,11 @@ export type KnowledgeCategory =
   | 'workflow'
   | 'conventions'
   | 'troubleshooting'
+  | 'vision'
+  | 'spec'
+  | 'research'
+  | 'decision'
+  | 'design'
   | 'other';
 
 export interface KnowledgeArticle {
