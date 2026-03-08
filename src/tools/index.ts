@@ -1,13 +1,16 @@
 /**
- * Tools Index
+ * Tools Index v2
  *
- * Export all tool registration functions.
+ * 5 tools for the Context Engine:
+ * - get_context: Load project context
+ * - log: Record events
+ * - search: Find fragments
+ * - intent: Track intents
+ * - get_guidelines: Fetch coding guidelines
  */
 
-export { registerTaskTools } from './tasks.js';
-export { registerProjectTools } from './projects.js';
-export { registerContextTools } from './context.js';
-export { registerKnowledgeTools } from './knowledge.js';
-export { registerVaultTools } from './vault.js';
-export { registerTechInfoTools } from './tech-info.js';
-export { registerGuidelineTools } from './guidelines.js';
+export { registerContextTool } from './context.js';
+export { registerLogTool } from './log.js';
+export { registerSearchTool } from './search.js';
+export { registerIntentTool } from './intent.js';
+export { registerGuidelineTool } from './guidelines.js';

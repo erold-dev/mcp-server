@@ -1,18 +1,17 @@
 /**
- * Erold MCP Server
+ * Erold MCP Server v2
  *
- * FastMCP server configuration and setup.
+ * Context Engine for AI Agents powered by Smart Strip compression.
+ * 5 tools: get_context, log, search, intent, get_guidelines
  */
 
 import { FastMCP } from 'fastmcp';
 import {
-  registerTaskTools,
-  registerProjectTools,
-  registerContextTools,
-  registerKnowledgeTools,
-  registerVaultTools,
-  registerTechInfoTools,
-  registerGuidelineTools,
+  registerContextTool,
+  registerLogTool,
+  registerSearchTool,
+  registerIntentTool,
+  registerGuidelineTool,
 } from './tools/index.js';
 
 /**
@@ -21,17 +20,15 @@ import {
 export function createServer(): FastMCP {
   const server = new FastMCP({
     name: 'erold',
-    version: '0.1.0',
+    version: '0.2.0',
   });
 
-  // Register all tools
-  registerTaskTools(server);
-  registerProjectTools(server);
-  registerContextTools(server);
-  registerKnowledgeTools(server);
-  registerVaultTools(server);
-  registerTechInfoTools(server);
-  registerGuidelineTools(server);
+  // Register all 5 tools
+  registerContextTool(server);
+  registerLogTool(server);
+  registerSearchTool(server);
+  registerIntentTool(server);
+  registerGuidelineTool(server);
 
   return server;
 }

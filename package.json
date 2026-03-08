@@ -1,7 +1,7 @@
 {
   "name": "@erold/mcp-server",
-  "version": "0.1.7",
-  "description": "MCP Server for Erold - AI-native project management",
+  "version": "0.2.0",
+  "description": "MCP Server for Erold - Context Engine for AI Agents",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,8 +26,9 @@
     "mcp",
     "model-context-protocol",
     "erold",
-    "project-management",
-    "ai",
+    "context-engine",
+    "ai-agents",
+    "smart-strip",
     "claude",
     "anthropic"
   ],

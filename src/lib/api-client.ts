@@ -1,25 +1,19 @@
 /**
- * Erold API Client
+ * Erold API Client v2
  *
- * HTTP client for communicating with the Erold REST API.
+ * HTTP client for the Erold Context Engine API.
  * Handles authentication, retries, and error handling.
  */
 
 import { getConfig } from './config.js';
 import { ApiError, isRetryableError } from './errors.js';
 import type {
-  Task,
-  TaskComment,
-  Project,
-  ProjectStats,
-  KnowledgeArticle,
-  AIContext,
-  Dashboard,
-  TenantStats,
-  WorkloadData,
-  Member,
-  Activity,
-  Tenant,
+  ContextResponse,
+  Event,
+  EventType,
+  Fragment,
+  Intent,
+  SearchResult,
 } from '../types/index.js';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
@@ -50,7 +44,7 @@ async function request<T>(
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-API-Key': config.apiKey,
-    'User-Agent': '@erold/mcp-server/0.1.0',
+    'User-Agent': '@erold/mcp-server/0.2.0',
     ...(options.headers as Record<string, string>),
   };
 
@@ -164,13 +158,6 @@ async function patch<T>(endpoint: string, data: unknown = {}): Promise<T> {
 }
 
 /**
- * DELETE request helper
- */
-async function del<T>(endpoint: string): Promise<T> {
-  return request<T>(endpoint, { method: 'DELETE' });
-}
-
-/**
  * Get tenant path prefix
  */
 function getTenantPath(): string {
@@ -179,317 +166,84 @@ function getTenantPath(): string {
 }
 
 // =============================================================================
-// API Methods
+// API Methods - v2 Context Engine
 // =============================================================================
-
-// --- Tasks ---
-export const tasks = {
-  list: (params: {
-    projectId?: string;
-    status?: string;
-    assignee?: string;
-    priority?: string;
-    limit?: number;
-  } = {}): Promise<Task[]> => get(`${getTenantPath()}/tasks`, params),
-
-  search: (query: string, params: { limit?: number } = {}): Promise<Task[]> =>
-    get(`${getTenantPath()}/tasks/search`, { q: query, ...params }),
-
-  mine: (params: { status?: string; limit?: number } = {}): Promise<Task[]> =>
-    get(`${getTenantPath()}/tasks/mine`, params),
-
-  blocked: (): Promise<Task[]> =>
-    get(`${getTenantPath()}/tasks/blocked`),
-
-  get: (id: string): Promise<Task> =>
-    get(`${getTenantPath()}/tasks/${id}`),
-
-  create: (projectId: string, data: {
-    title: string;
-    description?: string;
-    priority?: string;
-    assignedTo?: string;
-  }): Promise<Task> =>
-    post(`${getTenantPath()}/projects/${projectId}/tasks`, data),
-
-  update: (id: string, data: {
-    title?: string;
-    description?: string;
-    status?: string;
-    priority?: string;
-    assignedTo?: string;
-    blockedBy?: string[];
-    blockReason?: string;
-  }): Promise<Task> =>
-    patch(`${getTenantPath()}/tasks/${id}`, data),
-
-  delete: (id: string): Promise<void> =>
-    del(`${getTenantPath()}/tasks/${id}`),
-
-  // Actions
-  start: (id: string): Promise<Task> =>
-    post(`${getTenantPath()}/tasks/${id}/start`),
-
-  complete: (id: string, summary?: string): Promise<Task> =>
-    post(`${getTenantPath()}/tasks/${id}/complete`, { summary }),
-
-  block: (id: string, reason: string): Promise<Task> =>
-    post(`${getTenantPath()}/tasks/${id}/block`, { reason }),
-
-  logTime: (id: string, hours: number, notes?: string): Promise<void> =>
-    post(`${getTenantPath()}/tasks/${id}/log`, { hours, notes }),
-
-  // Comments
-  comments: (id: string): Promise<TaskComment[]> =>
-    get(`${getTenantPath()}/tasks/${id}/comments`),
-
-  addComment: (id: string, content: string): Promise<TaskComment> =>
-    post(`${getTenantPath()}/tasks/${id}/comments`, { content }),
-};
-
-// --- Projects ---
-// Note: Backend API uses 'title' but MCP uses 'name' - we map between them
-export const projects = {
-  list: async (params: { status?: string } = {}): Promise<Project[]> => {
-    const results = await get<Array<{ id: string; title?: string; description?: string; status: string; slug?: string; taskCount?: number; completedTasks?: number; createdAt?: string; updatedAt?: string }>>(`${getTenantPath()}/projects`, params);
-    return results.map(p => ({ ...p, name: p.title || '' })) as Project[];
-  },
-
-  get: async (id: string): Promise<Project> => {
-    const result = await get<{ id: string; title?: string; description?: string; status: string; slug?: string; taskCount?: number; completedTasks?: number; createdAt?: string; updatedAt?: string }>(`${getTenantPath()}/projects/${id}`);
-    return { ...result, name: result.title || '' } as Project;
-  },
-
-  create: async (data: {
-    name: string;
-    description?: string;
-    slug?: string;
-  }): Promise<Project> => {
-    // Map 'name' to 'title' for backend API
-    const result = await post<{ id: string; title?: string; description?: string; status: string; slug?: string }>(`${getTenantPath()}/projects`, { title: data.name, description: data.description, slug: data.slug, status: 'planning' });
-    return { ...result, name: result.title || '' } as Project;
-  },
-
-  update: async (id: string, data: {
-    name?: string;
-    description?: string;
-    status?: string;
-  }): Promise<Project> => {
-    // Map 'name' to 'title' for backend API
-    const payload: Record<string, unknown> = {};
-    if (data.name) payload.title = data.name;
-    if (data.description !== undefined) payload.description = data.description;
-    if (data.status) payload.status = data.status;
-
-    const result = await patch<{ id: string; title?: string; description?: string; status: string; slug?: string }>(`${getTenantPath()}/projects/${id}`, payload);
-    return { ...result, name: result.title || '' } as Project;
-  },
-
-  delete: (id: string): Promise<void> =>
-    del(`${getTenantPath()}/projects/${id}`),
-
-  stats: (id: string): Promise<ProjectStats> =>
-    get(`${getTenantPath()}/projects/${id}/stats`),
-
-  tasks: (id: string, params: { status?: string; limit?: number } = {}): Promise<Task[]> =>
-    get(`${getTenantPath()}/projects/${id}/tasks`, params),
-};
-
-// --- Knowledge ---
-export const knowledge = {
-  list: (params: { category?: string; projectId?: string; scope?: string; limit?: number } = {}): Promise<KnowledgeArticle[]> =>
-    get(`${getTenantPath()}/knowledge`, params),
-
-  get: (id: string): Promise<KnowledgeArticle> =>
-    get(`${getTenantPath()}/knowledge/${id}`),
-
-  getByCategory: (category: string): Promise<KnowledgeArticle[]> =>
-    get(`${getTenantPath()}/knowledge/category/${category}`),
-
-  create: (data: {
-    title: string;
-    category: string;
-    content: string;
-    projectId?: string | null;
-  }): Promise<KnowledgeArticle> =>
-    post(`${getTenantPath()}/knowledge`, data),
-
-  update: (id: string, data: {
-    title?: string;
-    category?: string;
-    content?: string;
-  }): Promise<KnowledgeArticle> =>
-    patch(`${getTenantPath()}/knowledge/${id}`, data),
-
-  delete: (id: string): Promise<void> =>
-    del(`${getTenantPath()}/knowledge/${id}`),
-
-  search: (query: string): Promise<KnowledgeArticle[]> =>
-    get(`${getTenantPath()}/knowledge`, { search: query }),
-};
-
-// --- Vault (Secrets) ---
-export interface VaultEntry {
-  id: string;
-  key: string;
-  value?: string;
-  category: string;
-  description?: string;
-  environment: string;
-  scope?: string;
-  isOwner?: boolean;
-  canRead?: boolean;
-  canEdit?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-}
-
-export const vault = {
-  list: (projectId: string): Promise<VaultEntry[]> =>
-    get(`${getTenantPath()}/projects/${projectId}/vault`),
-
-  get: (projectId: string, entryId: string): Promise<VaultEntry> =>
-    get(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`),
-
-  create: (projectId: string, data: {
-    key: string;
-    value: string;
-    scope?: string;
-    category?: string;
-    description?: string;
-    environment?: string;
-  }): Promise<VaultEntry> =>
-    post(`${getTenantPath()}/projects/${projectId}/vault`, data),
-
-  update: (projectId: string, entryId: string, data: {
-    value?: string;
-    category?: string;
-    description?: string;
-    environment?: string;
-  }): Promise<VaultEntry> =>
-    patch(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`, data),
-
-  delete: (projectId: string, entryId: string): Promise<void> =>
-    del(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`),
-};
-
-// --- Tech Info ---
-export interface TechInfo {
-  stack?: {
-    frontend?: string[];
-    backend?: string[];
-    database?: string[];
-    languages?: string[];
-    tools?: string[];
-    other?: string[];
-  };
-  deployment?: {
-    provider?: string;
-    region?: string;
-    urls?: {
-      production?: string;
-      staging?: string;
-      development?: string;
-    };
-    cicd?: string;
-    branch?: {
-      production?: string;
-      staging?: string;
-    };
-  };
-  commands?: Array<{
-    name: string;
-    command: string;
-    description?: string;
-  }>;
-  infrastructure?: {
-    domains?: string[];
-    cdn?: string;
-    dns?: string;
-    ssl?: string;
-    monitoring?: string;
-    logging?: string;
-    errorTracking?: string;
-  };
-  repositories?: Array<{
-    name: string;
-    url: string;
-    branch?: string;
-    type?: string;
-  }>;
-  environments?: Record<string, { description?: string; url?: string }>;
-  notes?: string;
-  custom?: Record<string, unknown>;
-  updatedAt?: string;
-  updatedBy?: string;
-}
-
-export const techInfo = {
-  get: (projectId: string): Promise<TechInfo> =>
-    get(`${getTenantPath()}/projects/${projectId}/tech-info`),
-
-  update: (projectId: string, data: Partial<TechInfo>): Promise<TechInfo> =>
-    patch(`${getTenantPath()}/projects/${projectId}/tech-info`, data),
-};
 
 // --- Context ---
 export const context = {
-  get: (): Promise<AIContext> =>
-    get(`${getTenantPath()}/context`),
-
-  dashboard: (): Promise<Dashboard> =>
-    get(`${getTenantPath()}/dashboard`),
-
-  stats: (): Promise<TenantStats> =>
-    get(`${getTenantPath()}/stats`),
-
-  workload: (): Promise<WorkloadData> =>
-    get(`${getTenantPath()}/workload`),
+  /**
+   * Get full context blob for a project (or default project)
+   */
+  get: (projectId?: string): Promise<ContextResponse> => {
+    const path = projectId
+      ? `${getTenantPath()}/context/${projectId}`
+      : `${getTenantPath()}/context`;
+    return get(path);
+  },
 };
 
-// --- Members ---
-export const members = {
-  list: (): Promise<Member[]> =>
-    get(`${getTenantPath()}/members`),
-
-  get: (uid: string): Promise<Member> =>
-    get(`${getTenantPath()}/members/${uid}`),
+// --- Events (log) ---
+export const events = {
+  /**
+   * Log a new event (will be Smart Strip compressed into fragments)
+   */
+  create: (data: {
+    projectId: string;
+    content: string;
+    type: EventType;
+    intentId?: string;
+  }): Promise<Event> =>
+    post(`${getTenantPath()}/events`, data),
 };
 
-// --- Activity ---
-export const activity = {
-  list: (params: { limit?: number; entityType?: string; entityId?: string } = {}): Promise<Activity[]> =>
-    get(`${getTenantPath()}/activity`, params),
-
-  forTask: (taskId: string): Promise<Activity[]> =>
-    get(`${getTenantPath()}/tasks/${taskId}/activity`),
+// --- Fragments (search) ---
+export const fragments = {
+  /**
+   * Search compressed fragments
+   */
+  search: (params: {
+    q: string;
+    projectId?: string;
+    type?: string;
+    limit?: number;
+  }): Promise<SearchResult> =>
+    get(`${getTenantPath()}/fragments/search`, params),
 };
 
-// --- Tenants ---
-export const tenants = {
-  list: (): Promise<Tenant[]> =>
-    get('/tenants'),
+// --- Intents ---
+export const intents = {
+  /**
+   * List active intents
+   */
+  list: (params: {
+    projectId?: string;
+    status?: string;
+  } = {}): Promise<Intent[]> =>
+    get(`${getTenantPath()}/intents`, params),
 
-  get: (id: string): Promise<Tenant> =>
-    get(`/tenants/${id}`),
-};
+  /**
+   * Create a new intent
+   */
+  create: (data: {
+    title: string;
+    description?: string;
+    projectId?: string;
+  }): Promise<Intent> =>
+    post(`${getTenantPath()}/intents`, data),
 
-// --- User ---
-export const user = {
-  me: (): Promise<{ id: string; name?: string; email: string }> =>
-    get('/me'),
+  /**
+   * Complete an intent
+   */
+  complete: (intentId: string, summary?: string): Promise<Intent> =>
+    patch(`${getTenantPath()}/intents/${intentId}`, {
+      status: 'completed',
+      summary,
+    }),
 };
 
 export default {
-  tasks,
-  projects,
-  knowledge,
-  vault,
-  techInfo,
   context,
-  members,
-  activity,
-  tenants,
-  user,
+  events,
+  fragments,
+  intents,
 };
